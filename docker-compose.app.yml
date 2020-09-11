@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  db:
+    image: mysql:5.7
+    container_name: database
+    volumes:
+      - database_volume:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:5.5.1-php7.4
+    container_name: wordpress
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: ${MYSQL_USER}
+      WORDPRESS_DB_PASSWORD: ${MYSQL_PASSWORD}
+      VIRTUAL_HOST: ${VIRTUAL_HOST}
+      LETSENCRYPT_HOST: ${LETSENCRYPT_HOST}
+      LETSENCRYPT_EMAIL: ${LETSENCRYPT_EMAIL}
+    volumes:
+      - ./wordpress:/var/www/html
+volumes:
+  database_volume:
+    external: true
+
+networks:
+  default:
+    external:
+      name: io.cristallum.grid
